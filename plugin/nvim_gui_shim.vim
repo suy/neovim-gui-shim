@@ -79,3 +79,37 @@ function GuiDrop(...)
 	exec 'drop '.join(l:args, ' ')
 	doautocmd BufEnter
 endfunction
+
+function! s:on_gui_event(jobid, data, event)
+  if a:event ==# 'exit'
+    let g:GuiJobId = 0
+    if a:data != 0
+      echoerr 'GUI closed with exit code ' . data
+    endif
+  endif
+endfunction
+
+" Start GUI from nvim, a wrapper around jobstart()
+function! GuiAttach()
+  if exists('g:gui_attach_argv')
+    " TODO: add option for rpc variant
+    let jobopts = {
+      \ 'on_exit': function('s:on_gui_event'),
+      \ }
+    let jobid = jobstart(g:gui_attach_argv, jobopts)
+
+    if jobid == 0
+      echoerr 'Could not spawn GUI, jobstart returned 0'
+      return 0
+    elseif jobid == -1
+      echoerr 'Could not spawn GUI, failed to execute' . string(g:gui_attach_argv)
+      return 0
+    else
+      let g:GuiJobId = jobid
+      return 1
+    endif
+  else
+    echoerr 'g:gui_argv MUST be set'
+    return 0
+  endif
+endfunction
