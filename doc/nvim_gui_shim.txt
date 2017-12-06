@@ -35,6 +35,9 @@ GuiFont		When called with no arguments this command display the
 			l   - light weight
 			i   - italic
 
+		As a convenience, you might pass a value like +2 or -3 to only
+		change the font height.
+
 		It warns and fails when an invalid font has specified.
 		Use a |bang| (!) to forcedly assign an invalid font like:
 >

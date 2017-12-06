@@ -52,7 +52,16 @@ function s:GuiFontCommand(fname, bang) abort
       echo 'No GuiFont is set'
     endif
   else
-    call GuiFont(a:fname, a:bang ==# '!')
+    let value = a:fname
+    if match(value, '^[+-]\d\+$') != -1
+      let change = strpart(value, 1) " How much to increase/decrease
+      let operator = value[0] == '+' ? 1 : -1
+      let index = match(g:GuiFont, '\d\+$')
+      let name = strpart(g:GuiFont, 0, index)
+      let number = strpart(g:GuiFont, index)
+      let value = name . (number + (operator * change))
+    endif
+    call GuiFont(value, a:bang ==# '!')
   endif
 endfunction
 command! -nargs=? -bang Guifont call s:GuiFontCommand("<args>", "<bang>")
